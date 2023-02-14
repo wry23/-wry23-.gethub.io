@@ -1,0 +1,333 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>地图练习</title>
+    <style type="text/css">
+    html,
+    body,
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+    .content-window-card {
+            position: relative;
+            box-shadow: none;
+            bottom: 0;
+            left: 0;
+            width: auto;
+            padding: 0;
+        }
+
+        .content-window-card p {
+            height: 2rem;
+        }
+
+        .custom-info {
+            border: solid 1px silver;
+        }
+
+        div.info-top {
+            position: relative;
+            background: none repeat scroll 0 0 #F9F9F9;
+            border-bottom: 1px solid #CCC;
+            border-radius: 5px 5px 0 0;
+        }
+
+        div.info-top div {
+            display: inline-block;
+            color: #333333;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 31px;
+            padding: 0 10px;
+        }
+
+        div.info-top img {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition-duration: 0.25s;
+        }
+
+        div.info-top img:hover {
+            box-shadow: 0px 0px 5px #000;
+        }
+
+        div.info-middle {
+            font-size: 12px;
+            padding: 10px 6px;
+            line-height: 20px;
+        }
+
+        div.info-bottom {
+            height: 0px;
+            width: 100%;
+            clear: both;
+            text-align: center;
+        }
+
+        div.info-bottom img {
+            position: relative;
+            z-index: 104;
+        }
+
+        span {
+            margin-left: 5px;
+            font-size: 11px;
+        }
+
+        .info-middle img {
+            float: left;
+            margin-right: 6px;
+        }
+        .amap-icon img,
+        .amap-marker-content img{
+            width: 25px;
+            height: 34px;
+        }
+
+        .marker {
+            position: absolute;
+            top: -20px;
+            right: -118px;
+            color: #fff;
+            padding: 4px 10px;
+            box-shadow: 1px 1px 1px rgba(10, 10, 10, .2);
+            white-space: nowrap;
+            font-size: 12px;
+            font-family: "";
+            background-color: #25A5F7;
+            border-radius: 3px;
+        }
+
+        
+    </style>
+    </style>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+     <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+	<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+	<script type="text/javascript">
+	        window._AMapSecurityConfig = {
+	            securityJsCode:'63d309a8749534aa045273e26cd94ec0',
+	        }
+	</script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=2b69be92ea2f18b0d01120895cca05ac&plugin=AMap.Driving"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script src="https://webapi.amap.com/loader.js"></script>
+    <!--引入高德地图JSAPI -->
+    <script type="text/javascript"
+    src="https://webapi.amap.com/maps?v=2.0&key=2b69be92ea2f18b0d01120895cca05ac&plugin=AMap.MouseTool,AMap.Driving,AMap.Transfer,AMap.Walking"></script>
+    <!--引入UI组件库（1.1版本） -->
+    <script src="http://webapi.amap.com/ui/1.1/main.js?v=1.1.1"></script>
+    <!-- 引入高德地图 LOCA 数据可视化 API 脚本 -->
+<script src="https://webapi.amap.com/loca?v=2.0.0&key=2b69be92ea2f18b0d01120895cca05ac"></script>
+<script type="text/javascript" >
+AMapLoader.load({
+    "key": "2b69be92ea2f18b0d01120895cca05ac",              // 申请好的Web端开发者Key，首次调用 load 时必填
+    "version": "2.0",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+    "plugins": [AMap.Scale],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+    "AMapUI": {             // 是否加载 AMapUI，缺省不加载
+        "version": '1.1',   // AMapUI 版本
+        "plugins":['overlay/SimpleMarker'],       // 需要加载的 AMapUI ui插件
+    },
+    "Loca":{                // 是否加载 Loca， 缺省不加载
+        "version": '2.0'  // Loca 版本
+    },
+}).then((AMap)=>{
+        var map = new AMap.Map('container');
+        map.addControl(new AMap.Scale());
+    }).catch((e)=>{
+        console.error(e);  //加载错误提示
+    });   
+</script>
+</head>
+<body>
+    <div id="container"></div>
+    <div class="input-card">
+    <h4>左击获取经纬度：</h4>
+    <div class="input-item">
+      <input type="text" readonly="true" id="lnglat">
+    </div>
+</div>
+    <div id="myPageTop">
+        <table>
+            <tr>
+                <td>
+                    <label>请输入关键字：</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input id="tipinput"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script type="text/javascript">
+        //地图加载
+        var map = new AMap.Map("container", {
+    resizeEnable: true,
+    center: [113.357583,23.15765],
+    zoom: 16
+});
+ //为地图注册click事件获取鼠标点击出的经纬度坐标
+ map.on('click', function(e) {
+        document.getElementById("lnglat").value = e.lnglat.getLng() + ',' + e.lnglat.getLat()
+    });
+addMarker();
+
+//添加marker标记
+function addMarker() {
+    map.clearMap();
+    var marker = new AMap.Marker({
+        map: map,
+        position: [113.357583,23.15765],
+        resizeEnable: true
+    });
+    //鼠标点击marker弹出自定义的信息窗体
+    marker.on('click', function () {
+        infoWindow.open(map, marker.getPosition());
+    });
+}
+
+//实例化信息窗体
+var title = '华南农业大学<span style="font-size:11px;color:#F00;">广州双一流高校</span>',
+    content = [];
+content.push("<img src='https://cn.bing.com/images/search?view=detailV2&ccid=tuB9wGcS&id=1650968BB5E0D84A928E9A6D712554F6C087A59A&thid=OIP.tuB9wGcSTHmIdFOWIoxh2QHaE8&mediaurl=https%3A%2F%2Fpic2.zhimg.com%2Fv2-c9f95d753ee496a3f01ff10fe0009213_1440w.jpg%3Fsource%3D172ae18b&exph=960&expw=1440&q=%e5%8d%8e%e5%8d%97%e5%86%9c%e4%b8%9a%e5%a4%a7%e5%ad%a6&simid=608027387972102844&form=IRPRST&ck=065B3AE5B1A604FA23E807AE00E64302&selectedindex=0&ajaxhist=0&ajaxserp=0&vt=0&sim=11'>地址：广东省广州市玉泉路");
+content.push("华南农业大学是国家“双一流”建设高校。校园坐落在素有“花城”美誉的广州市，土地总面积8261亩，其中天河五山校部4457亩，增城教学科研基地3804亩。学校建筑总面积140万平方米。自然景色与人文景观交相辉映，形成了“五湖四海一片林”的优美环境。");
+content.push("<a href='https://www.scau.edu.cn/'>详细信息</a>");
+var infoWindow = new AMap.InfoWindow({
+    isCustom: true,  //使用自定义窗体
+    content: createInfoWindow(title, content.join("<br/>")),
+    offset: new AMap.Pixel(16, -45)
+});
+
+//构建自定义信息窗体
+function createInfoWindow(title, content) {
+    var info = document.createElement("div");
+    info.className = "custom-info input-card content-window-card";
+
+    //可以通过下面的方式修改自定义窗体的宽高
+    info.style.width = "400px";
+    // 定义顶部标题
+    var top = document.createElement("div");
+    var titleD = document.createElement("div");
+    var closeX = document.createElement("img");
+    top.className = "info-top";
+    titleD.innerHTML = title;
+    closeX.src = "https://webapi.amap.com/images/close2.gif";
+    closeX.onclick = closeInfoWindow;
+
+    top.appendChild(titleD);
+    top.appendChild(closeX);
+    info.appendChild(top);
+
+    // 定义中部内容
+    var middle = document.createElement("div");
+    middle.className = "info-middle";
+    middle.style.backgroundColor = 'white';
+    middle.innerHTML = content;
+    info.appendChild(middle);
+
+    // 定义底部内容
+    var bottom = document.createElement("div");
+    bottom.className = "info-bottom";
+    bottom.style.position = 'relative';
+    bottom.style.top = '0px';
+    bottom.style.margin = '0 auto';
+    var sharp = document.createElement("img");
+    sharp.src = "https://webapi.amap.com/images/sharp.png";
+    bottom.appendChild(sharp);
+    info.appendChild(bottom);
+    return info;
+}
+
+//关闭信息窗体
+function closeInfoWindow() {
+    map.clearInfoWindow();
+}
+        //输入提示
+        var autoOptions = {
+            input: "tipinput"
+        };
+    
+        AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
+            var auto = new AMap.AutoComplete(autoOptions);
+            var placeSearch = new AMap.PlaceSearch({
+                map: map
+            });  //构造地点查询类
+            auto.on("select", select);//注册监听，当选中某条记录时会触发
+            function select(e) {
+                placeSearch.setCity(e.poi.adcode);
+                placeSearch.search(e.poi.name);  //关键字查询查询
+            }
+        });
+        
+    AMapUI.loadUI(['control/BasicControl'], function(BasicControl) {
+//添加一个缩放控件
+map.addControl(new BasicControl.Zoom({
+    position: 'lb',
+    showZoomNum: true
+}));
+//图层切换控件
+map.addControl(new BasicControl.LayerSwitcher({
+    position: 'lm'
+}));
+});
+var trafficLayer = new AMap.TileLayer.Traffic({
+        zIndex: 10,
+        zooms: [7, 22],
+    });
+
+    trafficLayer.setMap(map);
+
+    var isVisible = true;
+    function toggle() {
+        if (isVisible) {
+            trafficLayer.hide();
+            isVisible = false;
+        } else {
+            trafficLayer.show();
+            isVisible = true;
+        }
+    }
+        var contextMenu = new AMap.ContextMenu();
+
+    //右键放大
+    contextMenu.addItem("放大一级", function () {
+        map.zoomIn();
+    }, 0);
+
+    //右键缩小
+    contextMenu.addItem("缩小一级", function () {
+        map.zoomOut();
+    }, 1);
+
+    //右键显示全国范围
+    contextMenu.addItem("缩放至全国范围", function (e) {
+        map.setZoomAndCenter(4, [108.946609, 34.262324]);
+    }, 2);
+
+    //右键添加Marker标记
+    contextMenu.addItem("添加标记", function (e) {
+        var marker = new AMap.Marker({
+            map: map,
+            position: contextMenuPositon //基点位置
+        });
+    }, 3);
+
+    //地图绑定鼠标右击事件——弹出右键菜单
+    map.on('rightclick', function (e) {
+        contextMenu.open(map, e.lnglat);
+        contextMenuPositon = e.lnglat;
+    });
+
+    contextMenu.open(map, lnglat);
+    
+</script>
+</body>
+</html>
